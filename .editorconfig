@@ -1,0 +1,26 @@
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+indent_size = 2
+
+# Rust: O padrão da linguagem é 4 espaços
+[*.rs]
+indent_size = 4
+
+# Markdown: Espaços no final podem significar quebra de linha manual
+[*.md]
+trim_trailing_whitespace = false
+
+# Scripts e Configurações
+[*.{yml,yaml,json,toml}]
+indent_size = 2
+
+# Scripts Shell (Linux/VPS)
+[*.{sh,bash}]
+end_of_line = lf
+indent_size = 2

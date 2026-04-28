@@ -1,0 +1,39 @@
+# --- Rust ---
+/target
+# Se você quiser ignorar o Cargo.lock de bibliotecas (opcional)
+# Cargo.lock
+
+# --- Node/TypeScript ---
+node_modules/
+dist/
+*.tsbuildinfo
+npm-debug.log*
+yarn-error.log*
+.eslintcache
+
+# --- Database (SQLite Soberano) ---
+# Essencial para não subir seus dados reais ou travar o banco no Git
+*.db
+*.db-shm
+*.db-wal
+*.db-journal
+
+# --- Environment & Security ---
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# --- Docker & Deploy ---
+.docker/
+Docker-data/
+.vercel
+.turbo
+
+# --- IDE & OS ---
+.vscode/
+.cursor/
+.idea/
+.DS_Store
+Thumbs.db

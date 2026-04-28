@@ -1,0 +1,16 @@
+# Builds e Dependências
+node_modules/
+dist/
+*.tsbuildinfo
+coverage/
+
+# Logs e Caches
+*.log
+.npm/
+.cache/
+
+# IDE e SO
+.vscode/
+.cursor/
+.DS_Store
+Thumbs.db
