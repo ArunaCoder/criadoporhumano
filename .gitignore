@@ -3,13 +3,45 @@
 # Se você quiser ignorar o Cargo.lock de bibliotecas (opcional)
 # Cargo.lock
 
+# Build artifacts binários
+*.exe
+*.dll
+*.so
+*.dylib
+*.rlib
+*.a
+
 # --- Node/TypeScript ---
 node_modules/
 dist/
 *.tsbuildinfo
+*.map
 npm-debug.log*
+yarn-debug.log*
 yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+*.log
 .eslintcache
+.cache/
+.parcel-cache/
+
+# --- Test & Coverage ---
+coverage/
+.nyc_output/
+*.lcov
+test-results/
+.vitest/
+
+# --- Temporary & Debug Files ---
+*.tmp
+*.temp
+*.swp
+*~
+.DS_Store
+*.cpuprofile
+*.heapsnapshot
+*.heapprofile
 
 # --- Database (SQLite Soberano) ---
 # Essencial para não subir seus dados reais ou travar o banco no Git
@@ -25,15 +57,54 @@ yarn-error.log*
 *.pem
 *.key
 
+# Wildcards para arquivos secretos
+*secret*
+*Secret*
+*SECRET*
+*.credentials
+*.auth
+
 # --- Docker & Deploy ---
 .docker/
 Docker-data/
 .vercel
 .turbo
 
+# --- Backups & Dumps ---
+*.bak
+*.backup
+*.old
+*.orig
+*.sql
+*.dump
+*.patch
+*.diff
+
+# --- Cloud & Infra as Code ---
+.terraform/
+*.tfstate
+*.tfstate.backup
+.aws/
+.azure/
+fly.toml
+
+# --- Python (scripts de automação) ---
+__pycache__/
+*.py[cod]
+.pytest_cache/
+venv/
+.venv/
+
+# --- Editor History ---
+.history/
+.vim/
+*.vim
+.zsh_history
+.bash_history
+
 # --- IDE & OS ---
 .vscode/
 .cursor/
 .idea/
-.DS_Store
 Thumbs.db
+.DS_Store
