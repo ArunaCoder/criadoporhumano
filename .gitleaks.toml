@@ -1,0 +1,97 @@
+title = "Criado por Humano – Regras de Vazamento"
+version = 8
+
+[[rules]]
+id = "openai-key"
+description = "OpenAI API Key"
+regex = '''sk[-]?[a-zA-Z0-9]{32,}'''
+tags = ["apikey", "openai"]
+
+[[rules]]
+id = "aws-access-key"
+description = "AWS Access Key ID"
+regex = '''AKIA[0-9A-Z]{16}'''
+tags = ["apikey", "AWS"]
+
+[[rules]]
+id = "stripe-live-secret"
+description = "Stripe Live Secret Key"
+regex = '''sk_live_[0-9a-zA-Z]{24}'''
+tags = ["apikey", "stripe"]
+
+[[rules]]
+id = "mercadopago-access-token"
+description = "Mercado Pago Access Token"
+regex = '''APP_USR-[0-9]{12,}-[0-9]{6,}-[a-f0-9]{32}'''
+tags = ["apikey", "mercadopago"]
+
+[[rules]]
+id = "slack-bot-token"
+description = "Slack Bot Token"
+regex = '''xoxb-[0-9]{12}-[0-9]{12}-[a-zA-Z0-9]{24}'''
+tags = ["token", "slack"]
+
+[[rules]]
+id = "bearer-token"
+description = "Generic Bearer Token"
+regex = '''(?i)bearer\s+[a-z0-9\-._~+/]+=*'''
+tags = ["token", "auth"]
+
+[[rules]]
+id = "bearer-token-quoted"
+description = "Bearer Token entre aspas"
+regex = '''(?i)["']Bearer\s+[a-z0-9\-._~+/]+=*["']'''
+tags = ["token", "auth", "quoted"]
+
+[[rules]]
+id = "jwt"
+description = "JSON Web Token"
+regex = '''eyJ[a-zA-Z0-9-_=]+\.[a-zA-Z0-9-_=]+\.?[a-zA-Z0-9-_.+/=]*'''
+tags = ["token", "auth", "jwt"]
+
+[[rules]]
+id = "google-api-key"
+description = "Google API Key (prefixo AIza)"
+regex = '''AIza[0-9A-Za-z\-_]{35}'''
+tags = ["apikey", "google"]
+
+[[rules]]
+id = "firebase-auth-client-id"
+description = "Firebase Auth Web Client ID"
+regex = '''[0-9]{12,}-[a-z0-9]{32}\.apps\.googleusercontent\.com'''
+tags = ["firebase", "auth", "google"]
+
+[[rules]]
+id = "pem-private-key"
+description = "Bloco de chave privada (PEM/RSA)"
+regex = '''-----BEGIN (RSA |EC |DSA |OPENSSH |)?PRIVATE KEY-----'''
+tags = ["privatekey", "pem"]
+
+[[rules]]
+id = "firebase-config-object"
+description = "Bloco completo de configuração Firebase"
+regex = '''(?s)apiKey\s*:\s*["'][a-zA-Z0-9-_]{35,}["'].*?projectId\s*:\s*["'][a-z0-9-]{5,}["']'''
+tags = ["firebase", "config", "block"]
+
+[[rules]]
+id = "env-api-key-generic"
+description = "Variáveis .env com valores longos e suspeitos (32+ caracteres)"
+regex = '''(?i)[A-Z0-9_]{8,}\s*=\s*["']?[a-zA-Z0-9]{32,}["']?'''
+tags = ["env", "generic"]
+
+[[rules]]
+id = "database-connection-string"
+description = "PostgreSQL/MySQL Connection String"
+regex = '''postgres://[^:]+:[^@]+@[^/]+/[^\s"']+'''
+tags = ["database", "connection"]
+
+[[allowlists]]
+description = "Ignora arquivos que não precisam ser escaneados"
+paths = [
+  '''package-lock\.json''',
+  '''Cargo\.lock''',
+  '''node_modules/''',
+  '''target/''',
+  '''dist/''',
+  '''\.git/'''
+]

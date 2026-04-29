@@ -16,17 +16,25 @@
     "lint:fix": "eslint . --fix",
     "format": "prettier --write \"**/*.{ts,js,json,md}\"",
     "check-cycles": "node scripts/check-cycles.mjs",
-    "check-cycles:verbose": "node scripts/check-cycles.mjs --verbose"
+    "check-cycles:verbose": "node scripts/check-cycles.mjs --verbose",
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": "cross-env NODE_OPTIONS=--max-old-space-size=4096 eslint --cache --fix --max-warnings=0",
+    "*.{json,md}": "prettier --write"
   },
   "devDependencies": {
     "@types/node": "^25.6.0",
     "@typescript-eslint/eslint-plugin": "^8.59.1",
     "@typescript-eslint/parser": "^8.59.1",
+    "cross-env": "^10.1.0",
     "eslint": "^9.39.4",
     "eslint-config-prettier": "^10.1.8",
     "eslint-import-resolver-typescript": "^4.4.4",
     "eslint-plugin-import": "^2.32.0",
     "eslint-plugin-prettier": "^5.5.5",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.7",
     "prettier": "^3.8.3",
     "ts-node": "^10.9.2",
     "typescript": "^6.0.3"

@@ -7,7 +7,13 @@ import { fileURLToPath } from "url";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const SRC_DIR = path.resolve(__dirname, "../src");
+// Múltiplos diretórios para verificar (workspaces)
+const SRC_DIRS = [
+  path.resolve(__dirname, "../frontend/src"),
+  path.resolve(__dirname, "../sdk/src"),
+  path.resolve(__dirname, "../browser-extension/src"),
+].filter((dir) => fs.existsSync(dir));
+
 const LOG_FILE = path.resolve(__dirname, "../cycles-debug.log");
 const EXTENSIONS = [".ts", ".tsx", ".js", ".jsx"];
 
@@ -73,15 +79,16 @@ const logger = new Logger(LOG_FILE, VERBOSE);
  */
 function getAllFiles(dir, files = []) {
   const entries = fs.readdirSync(dir, { withFileTypes: true });
+  const projectRoot = path.resolve(__dirname, "..");
 
   for (const entry of entries) {
     const fullPath = path.join(dir, entry.name);
 
     if (entry.isDirectory()) {
-      logger.log(`[SCAN] Diretório: ${path.relative(SRC_DIR, fullPath)}/`);
+      logger.log(`[SCAN] Diretório: ${path.relative(projectRoot, fullPath)}/`);
       getAllFiles(fullPath, files);
     } else if (EXTENSIONS.includes(path.extname(entry.name))) {
-      logger.log(`[FOUND] ${path.relative(SRC_DIR, fullPath)}`);
+      logger.log(`[FOUND] ${path.relative(projectRoot, fullPath)}`);
       logger.stats.filesScanned++;
       files.push(fullPath);
     }
@@ -137,19 +144,27 @@ function extractImports(filePath) {
 function resolveImportPath(fromFile, importPath) {
   const fromDir = path.dirname(fromFile);
   const originalImport = importPath;
+  const projectRoot = path.resolve(__dirname, "..");
 
   logger.log(`  [RESOLVE] ${importPath}`);
 
   let resolved;
 
-  // Trata alias @/ como src/
+  // Trata alias @/ como src/ relativo ao workspace
   if (importPath.startsWith("@/")) {
-    logger.log(`    [ALIAS] Convertendo @/ para src/`);
+    logger.log(`    [ALIAS] Convertendo @/ para src/ do workspace`);
     importPath = importPath.replace("@/", "");
-    resolved = path.resolve(SRC_DIR, importPath);
+
+    // Encontra o workspace do arquivo atual
+    const workspace = SRC_DIRS.find((dir) => fromFile.startsWith(dir));
+    if (workspace) {
+      resolved = path.resolve(workspace, importPath);
+    } else {
+      resolved = path.resolve(fromDir, importPath);
+    }
   } else {
     // Import relativo
-    logger.log(`    [RELATIVE] Base: ${path.relative(SRC_DIR, fromDir)}/`);
+    logger.log(`    [RELATIVE] Base: ${path.relative(projectRoot, fromDir)}/`);
     resolved = path.resolve(fromDir, importPath);
   }
 
@@ -158,7 +173,7 @@ function resolveImportPath(fromFile, importPath) {
     const stat = fs.statSync(resolved);
     if (stat.isFile()) {
       logger.log(
-        `    [SUCCESS] Arquivo encontrado: ${path.relative(SRC_DIR, resolved)}`,
+        `    [SUCCESS] Arquivo encontrado: ${path.relative(projectRoot, resolved)}`,
       );
       logger.stats.importsResolved++;
       return resolved;
@@ -167,7 +182,7 @@ function resolveImportPath(fromFile, importPath) {
       // Tenta index.*
       for (const ext of EXTENSIONS) {
         const indexPath = path.join(resolved, `index${ext}`);
-        logger.log(`    [TRY] ${path.relative(SRC_DIR, indexPath)}`);
+        logger.log(`    [TRY] ${path.relative(projectRoot, indexPath)}`);
         if (fs.existsSync(indexPath)) {
           logger.log(`    [SUCCESS] Index encontrado`);
           logger.stats.importsResolved++;
@@ -180,7 +195,7 @@ function resolveImportPath(fromFile, importPath) {
   // Tenta adicionar extensões
   for (const ext of EXTENSIONS) {
     const withExt = `${resolved}${ext}`;
-    logger.log(`    [TRY] ${path.relative(SRC_DIR, withExt)}`);
+    logger.log(`    [TRY] ${path.relative(projectRoot, withExt)}`);
     if (fs.existsSync(withExt)) {
       logger.log(`    [SUCCESS] Arquivo encontrado com extensão ${ext}`);
       logger.stats.importsResolved++;
@@ -198,9 +213,10 @@ function resolveImportPath(fromFile, importPath) {
  */
 function buildDependencyGraph(files) {
   const graph = new Map();
+  const projectRoot = path.resolve(__dirname, "..");
 
   for (const file of files) {
-    logger.log(`\n[NODE] ${path.relative(SRC_DIR, file)}`);
+    logger.log(`\n[NODE] ${path.relative(projectRoot, file)}`);
     const imports = extractImports(file);
     const dependencies = [];
 
@@ -210,7 +226,7 @@ function buildDependencyGraph(files) {
       // Só adiciona se o arquivo resolvido existe no nosso conjunto
       if (files.includes(resolvedPath)) {
         dependencies.push(resolvedPath);
-        logger.log(`  [EDGE] -> ${path.relative(SRC_DIR, resolvedPath)}`);
+        logger.log(`  [EDGE] -> ${path.relative(projectRoot, resolvedPath)}`);
       }
     }
 
@@ -227,10 +243,11 @@ function detectCycles(graph) {
   const visited = new Set();
   const recursionStack = new Set();
   const cycles = [];
+  const projectRoot = path.resolve(__dirname, "..");
 
   function dfs(node, currentPath = []) {
     const indent = "  ".repeat(currentPath.length);
-    logger.log(`${indent}[VISIT] ${path.relative(SRC_DIR, node)}`);
+    logger.log(`${indent}[VISIT] ${path.relative(projectRoot, node)}`);
 
     if (recursionStack.has(node)) {
       // Encontrou um ciclo!
@@ -240,7 +257,7 @@ function detectCycles(graph) {
       cycles.push(cycle);
 
       const cyclePath = cycle
-        .map((f) => path.relative(SRC_DIR, f))
+        .map((f) => path.relative(projectRoot, f))
         .join(" -> ");
       logger.log(`${indent}[CYCLE] ${cyclePath}`);
       logger.stats.cyclesDetected++;
@@ -274,7 +291,7 @@ function detectCycles(graph) {
   for (const node of graph.keys()) {
     if (!visited.has(node)) {
       logger.log(
-        `\n[DFS] Iniciando busca a partir de: ${path.relative(SRC_DIR, node)}`,
+        `\n[DFS] Iniciando busca a partir de: ${path.relative(projectRoot, node)}`,
       );
       dfs(node);
     }
@@ -287,7 +304,8 @@ function detectCycles(graph) {
  * Formata o caminho do arquivo para exibição
  */
 function formatPath(filePath) {
-  return path.relative(SRC_DIR, filePath);
+  const projectRoot = path.resolve(__dirname, "..");
+  return path.relative(projectRoot, filePath);
 }
 
 /**
@@ -318,23 +336,28 @@ function main() {
   }
 
   logger.section("INICIALIZAÇÃO");
-  logger.log(`Diretório fonte: ${SRC_DIR}`);
+  logger.log(`Workspaces: ${SRC_DIRS.length}`);
+  SRC_DIRS.forEach((dir) => logger.log(`  - ${dir}`));
   logger.log(`Arquivo de log: ${LOG_FILE}`);
   logger.log(`Extensões suportadas: ${EXTENSIONS.join(", ")}`);
 
-  if (!fs.existsSync(SRC_DIR)) {
-    const error = `Diretório src/ não encontrado: ${SRC_DIR}`;
+  if (SRC_DIRS.length === 0) {
+    const error = `Nenhum diretório src/ encontrado nos workspaces`;
     logger.log(`[ERROR] ${error}`);
     logger.writeToFile();
     console.error(`❌ ${error}`);
     process.exit(1);
   }
 
-  // 1. Busca todos os arquivos
+  // 1. Busca todos os arquivos de todos os workspaces
   logger.section("DESCOBERTA DE ARQUIVOS");
-  logger.log(`Iniciando varredura em: ${SRC_DIR}`);
 
-  const files = getAllFiles(SRC_DIR);
+  const files = [];
+  SRC_DIRS.forEach((dir) => {
+    logger.log(`Iniciando varredura em: ${dir}`);
+    getAllFiles(dir, files);
+  });
+
   console.log(`📁 Arquivos encontrados: ${files.length}`);
 
   logger.log(`\n[SUMMARY] Total de arquivos: ${files.length}`);

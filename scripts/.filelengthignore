@@ -1,0 +1,16 @@
+# Dependências e travas
+
+package-lock.json
+Cargo.lock
+\*.tsbuildinfo
+
+# Documentação
+
+README.md
+AGENTS.md
+scripts/check-cycles.mjs
+
+# Infra e Configs
+
+.gitattributes
+.editorconfig
