@@ -1,19 +1,20 @@
 {
-  "name": "teste-tsconfig",
+  "name": "criadoporhumano",
   "version": "1.0.0",
-  "type": "module",
-  "description": "Projeto de treinamento TypeScript",
-  "main": "dist/index.js",
+  "private": true,
+  "description": "Monorepo - Análise Biométrica de Autoria",
+  "workspaces": [
+    "frontend",
+    "sdk",
+    "browser-extension"
+  ],
   "scripts": {
-    "start": "node dist/index.js",
-    "dev": "vite",
-    "build": "tsc && vite build",
-    "preview": "vite preview",
-    "watch": "tsc --watch",
-    "clean": "rm -rf dist",
+    "dev": "npm run dev -w frontend",
+    "build": "npm run build --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "format": "prettier --write \"src/**/*.ts\"",
+    "format": "prettier --write \"**/*.{ts,js,json,md}\"",
     "check-cycles": "node scripts/check-cycles.mjs",
     "check-cycles:verbose": "node scripts/check-cycles.mjs --verbose"
   },
@@ -28,7 +29,6 @@
     "eslint-plugin-prettier": "^5.5.5",
     "prettier": "^3.8.3",
     "ts-node": "^10.9.2",
-    "typescript": "^6.0.3",
-    "vite": "^8.0.10"
+    "typescript": "^6.0.3"
   }
 }

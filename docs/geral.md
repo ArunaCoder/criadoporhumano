@@ -154,3 +154,105 @@
 - **Depoimentos:** Social proof com casos de sucesso de clientes.
 - **Blog SEO:** Artigos otimizados sobre autenticação de conteúdo, detecção de IA, etc.
 - **Call-to-Action:** Fluxo otimizado para conversão (cadastro/trial).
+
+## 18. Segurança Adicional
+
+- **2FA (Autenticação em Dois Fatores):** Implementação de TOTP (Time-based One-Time Password) via apps como Google Authenticator ou Authy.
+- **Logs de Auditoria:** Registro completo de quem acessou certificados, quando e de onde (IP, user-agent, geolocalização).
+- **Criptografia de Dados Sensíveis em Repouso:** Garantir que todos os dados críticos (senhas, tokens, chaves) estejam criptografados no banco de dados.
+- **HTTPS/SSL Obrigatório:** Certificado SSL/TLS válido e renovação automática (Let's Encrypt), com redirecionamento forçado HTTP → HTTPS.
+- **Headers de Segurança:** Implementação de CSP (Content Security Policy), HSTS, X-Frame-Options, X-Content-Type-Options.
+- **Sanitização de Inputs:** Proteção contra SQL Injection, XSS, CSRF em todos os endpoints.
+- **Gestão de Senhas:** Hash com algoritmo moderno (Argon2 ou bcrypt), políticas de senha forte.
+
+## 19. Admin Tools e Testing Lab
+
+### Admin Dashboard
+
+- **Visão Global:** Interface administrativa com todas as análises processadas, filtros por score, data, usuário e status.
+- **Revisão Manual:** Sistema para revisar casos com score inconclusivo (40-70%) ou flagados como suspeitos.
+- **Replay Biométrico:** Visualização gráfica dos padrões de digitação e mouse para análise forense.
+  - Gráficos de dwell time ao longo do texto
+  - Gráficos de flight time (latência entre teclas)
+  - Heatmap de trajetória do mouse
+- **Flags e Feedback:** Sistema para marcar falsos positivos/negativos e alimentar melhoria contínua.
+- **Estatísticas Globais:**
+  - Taxa de acurácia do algoritmo
+  - Distribuição de scores (histograma)
+  - Volume de análises por dia/semana
+  - Tempo médio de processamento
+
+### Testing Lab (Ambiente de Desenvolvimento)
+
+- **Bot Simulator Básico:** Ferramenta que envia texto com timing perfeitamente uniforme (facilmente detectável).
+- **Bot Simulator Avançado:** Adiciona variação artificial, pausas aleatórias, correções simuladas e ruído nos timings.
+- **IA Adversarial:** Integração com modelos GPT para gerar padrões biométricos sintéticos que tentam imitar humanos.
+- **Dataset de Validação:** Banco com 100+ sessões rotuladas manualmente (ground truth) para validação do algoritmo.
+- **Replay de Sessões:** Re-processar dados históricos com novos parâmetros ou versões do algoritmo.
+- **A/B Testing:** Interface para testar múltiplas versões do algoritmo em paralelo e comparar resultados.
+- **Ajuste de Threshold:** Ferramenta visual para definir score mínimo (ex: 70%, 80%, 90%) com preview de impacto.
+
+### Métricas de Performance
+
+- **Acurácia:** (Verdadeiros Positivos + Verdadeiros Negativos) / Total
+- **Precisão:** VP / (VP + Falsos Positivos) - Quando diz "humano", qual % está correto
+- **Recall (Sensibilidade):** VP / (VP + Falsos Negativos) - Quantos humanos reais são detectados
+- **F1-Score:** Média harmônica entre precisão e recall
+- **Curva ROC:** Gráfico de trade-off entre taxa de falsos positivos e falsos negativos
+- **Confusion Matrix:** Tabela detalhada de VP, VN, FP, FN
+
+### Red Team / Pentesting
+
+- **Scripts de Ataque:** Repositório de scripts conhecidos que tentam burlar o sistema.
+- **Simulação Adversarial:** Bots sofisticados que tentam imitar padrões humanos com variação controlada.
+- **Rate Limiting Test:** Verificar se proteções anti-abuse funcionam sob carga.
+- **Documentação de Vulnerabilidades:** Registro de métodos que conseguiram burlar e contramedidas implementadas.
+- **Continuous Testing:** Testes automatizados que rodam diariamente contra o algoritmo em produção.
+
+---
+
+## 20. Funcionalidades Futuras (v2.0+)
+
+### Integrações e Extensibilidade
+
+**Arquitetura:** Core de captura biométrica único + adapters específicos por plataforma.
+
+- **Browser Extension Universal (PRIORIDADE v1.5):**
+  - Extensão Chrome/Firefox que injeta captura biométrica em qualquer editor web.
+  - Funciona automaticamente em WordPress, Medium, Notion, Google Docs, etc.
+  - Uma solução única para múltiplas plataformas.
+  - **Vantagem:** Controle total dos eventos de teclado/mouse independente de API limitada.
+
+- **SDK JavaScript Base:**
+  - Biblioteca core com lógica de captura biométrica (dwell/flight time, mouse tracking).
+  - Reutilizada por todas as integrações nativas.
+  - Comunicação padronizada com backend Rust.
+
+- **Plugin WordPress:** Integração nativa com editor Gutenberg (maior mercado CMS).
+- **Integração Google Docs:** Add-on para Google Workspace (limitação: API não expõe keystroke events, solução via mini-editor ou browser extension).
+- **Integração Notion:** API para validar blocos (mesma limitação do Google Docs).
+- **Integração outros CMS:** Drupal, Joomla, Wix, Squarespace via browser extension ou plugins específicos.
+
+### Monetização Avançada
+
+- **Sistema de Afiliados:** Programa de referral com comissões recorrentes.
+- **White-label:** Versão customizável para empresas (marca própria, domínio próprio).
+- **API Enterprise:** Planos corporativos com SLA garantido e suporte prioritário.
+
+### Expansão Internacional
+
+- **Internacionalização (i18n):** Suporte para inglês (EN), espanhol (ES), francês (FR).
+- **Datacenters Regionais:** Expansão para Europa e EUA para compliance local.
+- **Multi-moeda:** Suporte para USD, EUR, além de BRL.
+
+### Experiência do Usuário
+
+- **Mobile App Nativo:** Aplicativos iOS e Android com editor offline-first.
+- **Modo Offline:** Captura biométrica local com sincronização posterior.
+- **Colaboração em Tempo Real:** Múltiplos autores em um mesmo documento (similar ao Google Docs).
+
+### Analytics e Insights
+
+- **Dashboard Analítico:** Métricas de evolução do padrão biométrico ao longo do tempo.
+- **Relatórios Customizados:** Export de dados para compliance e auditoria.
+- **Benchmarking:** Comparação anônima com outros escritores do mesmo nicho.

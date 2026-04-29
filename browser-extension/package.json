@@ -1,0 +1,14 @@
+{
+  "name": "browser-extension",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Extensão de navegador - Análise Biométrica de Autoria",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch"
+  },
+  "devDependencies": {
+    "@types/chrome": "^0.0.268"
+  }
+}
