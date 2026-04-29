@@ -1,0 +1,45 @@
+[workspace]
+resolver = "3"
+members = [
+    "api",
+    "auth",
+    "biometric",
+    "certification",
+    "users",
+    "billing",
+    "storage",
+    "notifications",
+    "shared",
+    "cli",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+authors = ["Criado por Humano <contato@criadoporhumano.com.br>"]
+license = "MIT"
+repository = "https://github.com/criadoporhumano/criadoporhumano"
+
+# Dependências serão adicionadas conforme necessário
+# Veja Cargo.md para lista completa de dependências planejadas
+[workspace.dependencies]
+
+# Lints compartilhados - força boas práticas em todos os crates
+[workspace.lints.rust]
+unsafe_code = "forbid"           # Zero unsafe code (segurança crítica)
+unused_must_use = "deny"         # Força tratamento de Result/Option
+missing_docs = "warn"            # Documentação obrigatória
+
+[workspace.lints.clippy]
+all = { level = "warn", priority = -1 }
+pedantic = { level = "warn", priority = -1 }
+
+[profile.release]
+opt-level = 3
+lto = "thin"
+codegen-units = 1
+strip = true
+
+[profile.dev]
+opt-level = 0
+debug = true

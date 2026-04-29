@@ -1,5 +1,5 @@
 # --- Rust ---
-/target
+*/target
 # Se você quiser ignorar o Cargo.lock de bibliotecas (opcional)
 # Cargo.lock
 

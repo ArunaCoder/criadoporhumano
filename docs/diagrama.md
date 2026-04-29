@@ -25,95 +25,94 @@ criadoporhumano/
 │   ├── Dockerfile
 │   ├── .dockerignore
 │   │
-│   ├── crates/
-│   │   ├── api/                    # HTTP Server (Axum/Actix)
-│   │   │   ├── Cargo.toml
-│   │   │   └── src/
-│   │   │       ├── main.rs
-│   │   │       ├── routes/         # Definição de rotas
-│   │   │       │   ├── mod.rs
-│   │   │       │   ├── auth.rs
-│   │   │       │   ├── biometric.rs
-│   │   │       │   └── certification.rs
-│   │   │       ├── middleware/     # Auth, CORS, Rate limiting
-│   │   │       └── config.rs
-│   │   │
-│   │   ├── auth/                   # Domínio: Autenticação
-│   │   │   ├── Cargo.toml
-│   │   │   └── src/
-│   │   │       ├── lib.rs
-│   │   │       ├── models/         # User, Session, Token
-│   │   │       ├── service.rs      # Lógica de negócio
-│   │   │       ├── repository.rs   # Queries DB
-│   │   │       ├── jwt.rs          # JWT handling
-│   │   │       └── two_factor.rs   # 2FA (TOTP)
-│   │   │
-│   │   ├── biometric/              # Domínio: Análise Biométrica (CORE)
-│   │   │   ├── Cargo.toml
-│   │   │   └── src/
-│   │   │       ├── lib.rs
-│   │   │       ├── models/         # BiometricData, AnalysisResult
-│   │   │       ├── analyzer.rs     # Algoritmo principal
-│   │   │       ├── statistics.rs   # Desvio padrão, entropia
-│   │   │       ├── scoring.rs      # Cálculo de score 0-100%
-│   │   │       └── baseline.rs     # Perfil biométrico do usuário
-│   │   │
-│   │   ├── certification/          # Domínio: Certificados
-│   │   │   ├── Cargo.toml
-│   │   │   └── src/
-│   │   │       ├── lib.rs
-│   │   │       ├── models/         # Certificate, Badge
-│   │   │       ├── service.rs      # Geração de certificados
-│   │   │       ├── repository.rs
-│   │   │       └── verification.rs # Validação pública
-│   │   │
-│   │   ├── users/                  # Domínio: Usuários
-│   │   │   ├── Cargo.toml
-│   │   │   └── src/
-│   │   │       ├── lib.rs
-│   │   │       ├── models/         # User, Profile, Settings
-│   │   │       ├── service.rs
-│   │   │       └── repository.rs
-│   │   │
-│   │   ├── billing/                # Domínio: Pagamentos
-│   │   │   ├── Cargo.toml
-│   │   │   └── src/
-│   │   │       ├── lib.rs
-│   │   │       ├── models/         # Subscription, Invoice
-│   │   │       ├── service.rs
-│   │   │       ├── stripe.rs       # Integração Stripe
-│   │   │       └── mercadopago.rs  # Integração Mercado Pago
-│   │   │
-│   │   ├── storage/                # Domínio: Armazenamento Criptografado
-│   │   │   ├── Cargo.toml
-│   │   │   └── src/
-│   │   │       ├── lib.rs
-│   │   │       ├── encryption.rs   # AES-256
-│   │   │       ├── kms.rs          # Key Management
-│   │   │       └── repository.rs
-│   │   │
-│   │   ├── notifications/          # Domínio: Emails/Notificações
-│   │   │   ├── Cargo.toml
-│   │   │   └── src/
-│   │   │       ├── lib.rs
-│   │   │       ├── email.rs        # SendGrid/SES
-│   │   │       ├── templates/      # Templates de email
-│   │   │       └── service.rs
-│   │   │
-│   │   ├── shared/                 # Código compartilhado
-│   │   │   ├── Cargo.toml
-│   │   │   └── src/
-│   │   │       ├── lib.rs
-│   │   │       ├── db.rs           # Pool PostgreSQL
-│   │   │       ├── redis.rs        # Cliente Redis
-│   │   │       ├── errors.rs       # Error types customizados
-│   │   │       ├── utils.rs
-│   │   │       └── types.rs        # Types comuns
-│   │   │
-│   │   └── cli/                    # CLI tools (migrations, admin)
-│   │       ├── Cargo.toml
-│   │       └── src/
-│   │           └── main.rs
+│   ├── api/                        # HTTP Server (Axum/Actix)
+│   │   ├── Cargo.toml
+│   │   └── src/
+│   │       ├── main.rs
+│   │       ├── routes/             # Definição de rotas
+│   │       │   ├── mod.rs
+│   │       │   ├── auth.rs
+│   │       │   ├── biometric.rs
+│   │       │   └── certification.rs
+│   │       ├── middleware/         # Auth, CORS, Rate limiting
+│   │       └── config.rs
+│   │
+│   ├── auth/                       # Domínio: Autenticação
+│   │   ├── Cargo.toml
+│   │   └── src/
+│   │       ├── lib.rs
+│   │       ├── models/             # User, Session, Token
+│   │       ├── service.rs          # Lógica de negócio
+│   │       ├── repository.rs       # Queries DB
+│   │       ├── jwt.rs              # JWT handling
+│   │       └── two_factor.rs       # 2FA (TOTP)
+│   │
+│   ├── biometric/                  # Domínio: Análise Biométrica (CORE)
+│   │   ├── Cargo.toml
+│   │   └── src/
+│   │       ├── lib.rs
+│   │       ├── models/             # BiometricData, AnalysisResult
+│   │       ├── analyzer.rs         # Algoritmo principal
+│   │       ├── statistics.rs       # Desvio padrão, entropia
+│   │       ├── scoring.rs          # Cálculo de score 0-100%
+│   │       └── baseline.rs         # Perfil biométrico do usuário
+│   │
+│   ├── certification/              # Domínio: Certificados
+│   │   ├── Cargo.toml
+│   │   └── src/
+│   │       ├── lib.rs
+│   │       ├── models/             # Certificate, Badge
+│   │       ├── service.rs          # Geração de certificados
+│   │       ├── repository.rs
+│   │       └── verification.rs     # Validação pública
+│   │
+│   ├── users/                      # Domínio: Usuários
+│   │   ├── Cargo.toml
+│   │   └── src/
+│   │       ├── lib.rs
+│   │       ├── models/             # User, Profile, Settings
+│   │       ├── service.rs
+│   │       └── repository.rs
+│   │
+│   ├── billing/                    # Domínio: Pagamentos
+│   │   ├── Cargo.toml
+│   │   └── src/
+│   │       ├── lib.rs
+│   │       ├── models/             # Subscription, Invoice
+│   │       ├── service.rs
+│   │       ├── stripe.rs           # Integração Stripe
+│   │       └── mercadopago.rs      # Integração Mercado Pago
+│   │
+│   ├── storage/                    # Domínio: Armazenamento Criptografado
+│   │   ├── Cargo.toml
+│   │   └── src/
+│   │       ├── lib.rs
+│   │       ├── encryption.rs       # AES-256
+│   │       ├── kms.rs              # Key Management
+│   │       └── repository.rs
+│   │
+│   ├── notifications/              # Domínio: Emails/Notificações
+│   │   ├── Cargo.toml
+│   │   └── src/
+│   │       ├── lib.rs
+│   │       ├── email.rs            # SendGrid/SES
+│   │       ├── templates/          # Templates de email
+│   │       └── service.rs
+│   │
+│   ├── shared/                     # Código compartilhado
+│   │   ├── Cargo.toml
+│   │   └── src/
+│   │       ├── lib.rs
+│   │       ├── db.rs               # Pool PostgreSQL
+│   │       ├── redis.rs            # Cliente Redis
+│   │       ├── errors.rs           # Error types customizados
+│   │       ├── utils.rs
+│   │       └── types.rs            # Types comuns
+│   │
+│   ├── cli/                        # CLI tools (migrations, admin)
+│   │   ├── Cargo.toml
+│   │   └── src/
+│   │       └── main.rs
 │   │
 │   ├── migrations/                 # SQL migrations
 │   │   ├── 001_initial_schema.sql
@@ -324,16 +323,16 @@ criadoporhumano/
 # backend/Cargo.toml
 [workspace]
 members = [
-    "crates/api",
-    "crates/auth",
-    "crates/biometric",
-    "crates/certification",
-    "crates/users",
-    "crates/billing",
-    "crates/storage",
-    "crates/notifications",
-    "crates/shared",
-    "crates/cli"
+    "api",
+    "auth",
+    "biometric",
+    "certification",
+    "users",
+    "billing",
+    "storage",
+    "notifications",
+    "shared",
+    "cli",
 ]
 ```
 
