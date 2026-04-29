@@ -333,21 +333,7 @@ Dependências circulares ocorrem quando o Arquivo A importa o B, e o Arquivo B (
 
 ##### 1. Instalação e Script
 
-Embora o TypeScript permita ciclos, usamos a biblioteca `madge` para proibi-los no nosso fluxo de trabalho.
-
-```bash
-npm install -D madge
-```
-
-No `package.json`, adicione o script de verificação:
-
-```json
-"scripts": {
-  "check:circular": "madge --circular --extensions ts ./src"
-}
-```
-
-- **Por que uma biblioteca externa?** O compilador do TypeScript (`tsc`) ignora ciclos por design. Criar um verificador manual exigiria criar um analisador de AST (Abstract Syntax Tree) para rastrear imports recursivos. A `madge` resolve isso de forma binária: ou o código está limpo, ou ela aponta exatamente onde o ciclo começa e termina.
+Embora o TypeScript permita ciclos, poderíamos usar a biblioteca `madge` para proibi-los no nosso fluxo de trabalho. Mas vamos criar nosso próprio script.
 
 ##### 2. Integração com Git Hooks (Husky)
 
