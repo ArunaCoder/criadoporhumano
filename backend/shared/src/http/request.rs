@@ -1,4 +1,4 @@
-use ::std::path::{Path, PathBuf};
+use ::std::path::PathBuf;
 use std::collections::HashMap;
 use std::env;
 use std::io::{BufRead, BufReader, Read};
@@ -30,18 +30,23 @@ impl HttpRequest {
         }
 
         // Parsear linha de request
-        let parts: Vec<&str> = line.split_whitespace().collect();
-        if parts.len() != 3 {
-            return Err("Invalid request line: expected METHOD PATH VERSION".to_string());
-        }
+        let (method, path, version) = {
+            let parts: Vec<&str> = line.split_whitespace().collect();
+            if parts.len() != 3 {
+                return Err("Invalid request line: expected METHOD PATH VERSION".into());
+            }
 
-        let method = parts[0];
-        let path = parts[1];
-        let version = parts[2];
+            // Extraímos os três como Strings independentes
+            (
+                parts[0].to_string(),
+                parts[1].to_string(),
+                parts[2].to_string(),
+            )
+        };
 
         // Validar HTTP
         const ALLOWED_METHODS: &[&str] = &["GET", "POST", "HEAD", "OPTIONS"];
-        if !ALLOWED_METHODS.contains(&method) {
+        if !ALLOWED_METHODS.contains(&method.as_str()) {
             return Err(format!("Method not allowed: {}", method));
         }
 
