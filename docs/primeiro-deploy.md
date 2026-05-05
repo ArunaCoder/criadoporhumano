@@ -51,7 +51,7 @@ GET /      → "Criado por Humano API"
 - [ ] **Backend Hello World**
 
   ```bash
-  # backend/crates/api/src/main.rs
+  # backend/api/src/main.rs
   cargo new --bin backend
   # Implementar endpoint /health básico com Axum
   cargo build --release

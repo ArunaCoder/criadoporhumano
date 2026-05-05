@@ -1,3 +1,8 @@
+
+# --- Temp ---
+backend/api/public/
+
+
 # --- Rust ---
 */target
 # Se você quiser ignorar o Cargo.lock de bibliotecas (opcional)
