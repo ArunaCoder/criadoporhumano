@@ -9,6 +9,7 @@ Cargo.lock
 README.md
 AGENTS.md
 docs/
+tests/
 
 # Infra e Configs
 

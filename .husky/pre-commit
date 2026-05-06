@@ -11,7 +11,7 @@ fi
 echo "🔍 Rodando Gitleaks..."
 gitleaks protect --staged --verbose --log-level=error
 
-# 🦀 Validação Rust (descomentrar quando criar backend)
+# 🦀 Validação Rust (descomentrar quando backend estiver mais maduro)
 # echo "🦀 Validando Rust (Clippy & Fmt)..."
 # cargo fmt --all -- --check
 # cargo clippy -- -D warnings

@@ -7,7 +7,46 @@ Testes de segurança e penetração para validar robustez dos serviços.
 Estes scripts destinam-se **exclusivamente** a testes em ambientes próprios/controlados.
 Usar contra sistemas sem autorização explícita é **ilegal** e **antiético**.
 
+## 🚀 Quick Start (Shell Scripts)
+
+**Novos scripts executáveis** para testes rápidos sem problemas de copy/paste:
+
+```bash
+# Terminal 1: Iniciar servidor
+cd backend/api
+cargo run
+
+# Terminal 2: Executar testes
+./tests/security/run-all-tests.sh              # Todos os testes
+./tests/security/test-legitimate.sh            # Baseline (deve funcionar)
+./tests/security/test-path-traversal.sh        # Path traversal attacks
+./tests/security/test-headers.sh               # Header bombs
+./tests/security/test-methods.sh               # HTTP methods
+```
+
+**Output colorido:**
+
+- 🟢 Verde = Comportamento correto (bloqueado ou aceito conforme esperado)
+- 🔴 Vermelho = Vulnerabilidade ou erro
+- 🟡 Amarelo = Resultado inesperado
+
+---
+
 ## Scripts Disponíveis
+
+### Shell Scripts (`.sh`)
+
+**Executáveis prontos** para testes manuais rápidos:
+
+- `run-all-tests.sh` — Executa suite completa
+- `test-legitimate.sh` — Requisições válidas (baseline)
+- `test-path-traversal.sh` — 7 variações de path traversal
+- `test-headers.sh` — Header bombs e giant headers
+- `test-methods.sh` — Métodos HTTP permitidos/proibidos
+
+**Referência completa:** Ver [curl-test-commands.md](curl-test-commands.md)
+
+---
 
 ### `dos_attack_test.py`
 

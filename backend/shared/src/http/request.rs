@@ -62,28 +62,6 @@ impl HttpRequest {
             return Err("HTTP version not supported".to_string());
         }
 
-        let base_dir = env::var("PUBLIC_DIR").unwrap_or_else(|_| "public".to_string());
-
-        let base = PathBuf::from(base_dir);
-
-        let requested = base.join(path.trim_start_matches('/'));
-
-        let canonical = requested
-            .canonicalize()
-            .map_err(|_| "invalid path or file not found".to_string())?;
-
-        let base_canonical = base
-            .canonicalize()
-            .map_err(|_| "Failed to resolve base directory".to_string())?;
-
-        if !canonical.starts_with(&base_canonical) {
-            return Err("Path traversal detected".to_string());
-        }
-
-        if path.contains("..") || path.contains("//") {
-            return Err("Invalid path".to_string());
-        }
-
         // Parse HTTP headers with protection against HashDoS
         let mut headers: HashMap<String, String> = HashMap::with_capacity(15);
 
@@ -122,6 +100,28 @@ impl HttpRequest {
                     value.trim().to_string(),
                 );
             }
+        }
+
+        let base_dir = env::var("PUBLIC_DIR").unwrap_or_else(|_| "public".to_string());
+
+        let base = PathBuf::from(base_dir);
+
+        let requested = base.join(path.trim_start_matches('/'));
+
+        let canonical = requested
+            .canonicalize()
+            .map_err(|_| "invalid path or file not found".to_string())?;
+
+        let base_canonical = base
+            .canonicalize()
+            .map_err(|_| "Failed to resolve base directory".to_string())?;
+
+        if !canonical.starts_with(&base_canonical) {
+            return Err("Path traversal detected".to_string());
+        }
+
+        if path.contains("..") || path.contains("//") {
+            return Err("Invalid path".to_string());
         }
 
         Ok(HttpRequest {

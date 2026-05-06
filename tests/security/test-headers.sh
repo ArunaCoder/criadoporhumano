@@ -1,0 +1,67 @@
+#!/bin/bash
+
+# Test Header Bomb Attacks
+# Usage: ./test-headers.sh
+
+echo "💣 Header Bomb Attack Tests"
+echo "============================"
+echo ""
+
+BASE_URL="http://localhost:8080"
+
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+NC='\033[0m'
+
+test_header() {
+    local description="$1"
+    shift
+    local curl_args="$@"
+
+    echo -n "Testing: $description ... "
+
+    http_code=$(curl -s -o /dev/null -w "%{http_code}" $curl_args "$BASE_URL/" 2>/dev/null)
+
+    if [ "$http_code" -eq 400 ] || [ "$http_code" -eq 431 ]; then
+        echo -e "${GREEN}✓ BLOCKED${NC} (HTTP $http_code)"
+    elif [ "$http_code" -eq 200 ]; then
+        echo -e "${YELLOW}⚠ ACCEPTED${NC} (HTTP $http_code)"
+    else
+        echo -e "${RED}✗ ERROR${NC} (HTTP $http_code)"
+    fi
+}
+
+echo "Expected: Giant headers and excessive quantity should be BLOCKED"
+echo ""
+
+# Test 1: Giant header (exceeds MAX_LINE_SIZE)
+test_header "Giant header (10KB)" -H "X-Giant: $(python3 -c 'print("A"*10000)')"
+
+# Test 2: Many headers (exceeds MAX_HEADERS)
+echo -n "Testing: Many headers (150) ... "
+HEADERS=""
+for i in {1..150}; do
+    HEADERS="$HEADERS -H \"X-Test-$i: value\""
+done
+http_code=$(eval "curl -s -o /dev/null -w '%{http_code}' $HEADERS $BASE_URL/ 2>/dev/null")
+
+if [ "$http_code" -eq 400 ]; then
+    echo -e "${GREEN}✓ BLOCKED${NC} (HTTP $http_code)"
+elif [ "$http_code" -eq 200 ]; then
+    echo -e "${YELLOW}⚠ ACCEPTED${NC} (HTTP $http_code)"
+else
+    echo -e "${RED}✗ ERROR${NC} (HTTP $http_code)"
+fi
+
+# Test 3: Multiple giant headers
+test_header "Multiple giant headers" \
+    -H "X-Giant-1: $(python3 -c 'print("A"*8000)')" \
+    -H "X-Giant-2: $(python3 -c 'print("B"*8000)')"
+
+# Test 4: Header with excessive spaces (should work, but trim)
+test_header "Spaced header values" -H "X-Custom-Header:   spaced value   "
+
+echo ""
+echo "============================"
+echo "Header tests completed"
