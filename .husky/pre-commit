@@ -20,7 +20,9 @@ echo "⚠️ TypeScript BYPASSADO (apenas backend em desenvolvimento)"
 # echo "🕵️ Verificando tipos com TypeScript..."
 # npx tsc -b
 
-echo "🔄 Verificando dependências circulares..."
+echo ""
+
+# echo "🔄 Verificando dependências circulares..."
 node scripts/check-cycles.mjs
 
 echo "📏 Verificando tamanho de arquivos..."
