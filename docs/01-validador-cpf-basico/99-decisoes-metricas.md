@@ -271,7 +271,7 @@ Antes de deploy em produção, executar:
 
 ```bash
 # Enviar request line gigante (deve rejeitar em 8KB)
-python3 -c "print('GET /' + 'A'*10000 + ' HTTP/1.1\r\n\r\n')" | nc localhost 8080
+python -c "print('GET /' + 'A'*10000 + ' HTTP/1.1\r\n\r\n')" | nc localhost 8080
 
 # Enviar body gigante (deve rejeitar em 8KB)
 dd if=/dev/zero bs=1M count=10 | curl -X POST --data-binary @- http://localhost:8080/api/validate

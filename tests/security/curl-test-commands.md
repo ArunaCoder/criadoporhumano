@@ -102,14 +102,14 @@ curl -H "X-Test-1: value" -H "X-Test-2: value" -H "X-Test-3: value" \
 ### Header gigante (testar MAX_LINE_SIZE)
 
 ```bash
-curl -H "X-Giant: $(python3 -c 'print("A"*10000)')" http://localhost:8080/
+curl -H "X-Giant: $(python -c 'print("A"*10000)')" http://localhost:8080/
 ```
 
 ### Combinação: múltiplos headers gigantes
 
 ```bash
-curl -H "X-Giant-1: $(python3 -c 'print("A"*8000)')" \
-     -H "X-Giant-2: $(python3 -c 'print("B"*8000)')" \
+curl -H "X-Giant-1: $(python -c 'print("A"*8000)')" \
+     -H "X-Giant-2: $(python -c 'print("B"*8000)')" \
      http://localhost:8080/
 ```
 
@@ -177,7 +177,7 @@ curl -X TRACE http://localhost:8080/
 
 ```bash
 curl -X POST -H "Content-Type: application/json" \
-     -d "$(python3 -c 'print("{"*10000)')" \
+     -d "$(python -c 'print("{"*10000)')" \
      http://localhost:8080/api/data
 ```
 
@@ -329,14 +329,14 @@ cat backend/api/debug_request.txt
 echo -e "GET / HTTP/1.1\r\nHost: localhost\r\n\r\n" | nc localhost 8080
 ```
 
-### Python3 — Gerar payloads
+### python — Gerar payloads
 
 ```bash
 # String gigante
-python3 -c 'print("A"*10000)'
+python -c 'print("A"*10000)'
 
 # JSON malformado
-python3 -c 'print("{"*1000)'
+python -c 'print("{"*1000)'
 ```
 
 ### Watch — Monitorar logs

@@ -9,7 +9,6 @@ Cargo.lock
 README.md
 AGENTS.md
 docs/
-tests/
 
 # Infra e Configs
 
@@ -18,4 +17,9 @@ tests/
 
 # Scripts
 
+tests/
 scripts/check-cycles.mjs
+
+# muito documentados. **corrigir o script para não considerar comentários**
+
+backend/shared/src/http/server.r

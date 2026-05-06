@@ -43,6 +43,7 @@ test_request "GET with custom headers" \
 # Test 3: POST with JSON
 test_request "POST with JSON" \
     "$BASE_URL/api/data -X POST -H 'Content-Type: application/json' -d '{\"name\":\"test\",\"value\":123}'"
+echo -e "  ${YELLOW}ℹ${NC}  Note: This will be corrected when POST method is implemented"
 
 # Test 4: HEAD request
 test_request "HEAD request" "$BASE_URL/index.html -X HEAD"

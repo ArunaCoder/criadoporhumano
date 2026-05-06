@@ -157,7 +157,7 @@ Aguardar propagação: 5min-2h
 
 ```bash
 # Instalar Certbot
-sudo apt install certbot python3-certbot-nginx
+sudo apt install certbot python-certbot-nginx
 
 # Obter certificado SSL
 sudo certbot --nginx -d criadoporhumano.com.br -d www.criadoporhumano.com.br -d api.criadoporhumano.com.br

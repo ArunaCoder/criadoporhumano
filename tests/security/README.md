@@ -125,7 +125,7 @@ tests/security/
 
 ```bash
 # Python 3.7+, stdlib apenas (socket, argparse, time, signal)
-python3 dos_attack_test.py
+python dos_attack_test.py
 ```
 
 ## Integração CI/CD

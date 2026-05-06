@@ -14,7 +14,7 @@ pub struct HttpRequest {
 }
 
 impl HttpRequest {
-    pub fn parse(reader: &mut BufReader<TcpStream>) -> Result<Self, String> {
+    pub fn parse(reader: &mut BufReader<&mut TcpStream>) -> Result<Self, String> {
         const MAX_LINE_SIZE: usize = 8192;
         const TYPICAL_LINE_SIZE: usize = 1024; // 1KB covers 99% of real requests
         const MAX_HEADERS: usize = 100;

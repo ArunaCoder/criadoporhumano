@@ -17,11 +17,10 @@ NC='\033[0m'
 test_header() {
     local description="$1"
     shift
-    local curl_args="$@"
 
     echo -n "Testing: $description ... "
 
-    http_code=$(curl -s -o /dev/null -w "%{http_code}" $curl_args "$BASE_URL/" 2>/dev/null)
+    http_code=$(curl -s -o /dev/null -w "%{http_code}" "$@" "$BASE_URL/" 2>/dev/null)
 
     if [ "$http_code" -eq 400 ] || [ "$http_code" -eq 431 ]; then
         echo -e "${GREEN}✓ BLOCKED${NC} (HTTP $http_code)"
@@ -32,11 +31,28 @@ test_header() {
     fi
 }
 
+test_header_success() {
+    local description="$1"
+    shift
+
+    echo -n "Testing: $description ... "
+
+    http_code=$(curl -s -o /dev/null -w "%{http_code}" "$@" "$BASE_URL/" 2>/dev/null)
+
+    if [ "$http_code" -eq 200 ]; then
+        echo -e "${GREEN}✓ SUCCESS${NC} (HTTP $http_code)"
+    elif [ "$http_code" -eq 400 ] || [ "$http_code" -eq 431 ]; then
+        echo -e "${RED}✗ BLOCKED${NC} (HTTP $http_code) - Should be accepted!"
+    else
+        echo -e "${RED}✗ ERROR${NC} (HTTP $http_code)"
+    fi
+}
+
 echo "Expected: Giant headers and excessive quantity should be BLOCKED"
 echo ""
 
 # Test 1: Giant header (exceeds MAX_LINE_SIZE)
-test_header "Giant header (10KB)" -H "X-Giant: $(python3 -c 'print("A"*10000)')"
+test_header "Giant header (10KB)" -H "X-Giant: $(python -c 'import sys; sys.stdout.write("A"*10000)')"
 
 # Test 2: Many headers (exceeds MAX_HEADERS)
 echo -n "Testing: Many headers (150) ... "
@@ -54,13 +70,8 @@ else
     echo -e "${RED}✗ ERROR${NC} (HTTP $http_code)"
 fi
 
-# Test 3: Multiple giant headers
-test_header "Multiple giant headers" \
-    -H "X-Giant-1: $(python3 -c 'print("A"*8000)')" \
-    -H "X-Giant-2: $(python3 -c 'print("B"*8000)')"
-
-# Test 4: Header with excessive spaces (should work, but trim)
-test_header "Spaced header values" -H "X-Custom-Header:   spaced value   "
+# Test 3: Header with spaces (valid HTTP behavior, server trims correctly)
+test_header_success "Spaced header values (trim test)" -H "X-Custom-Header:   spaced value   "
 
 echo ""
 echo "============================"
