@@ -3,5 +3,8 @@ name = "api"
 version = "0.1.0"
 edition = "2024"
 
+[features]
+debug-http = ["shared/debug-http"]
+
 [dependencies]
 shared = { path = "../shared" }

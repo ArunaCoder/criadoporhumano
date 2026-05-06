@@ -28,6 +28,14 @@ fn handle_connection(stream: std::net::TcpStream) {
             println!("✅ Request válida:");
             println!("   Method: {}", req.method);
             println!("   Path: {}", req.path);
+
+            #[cfg(feature = "debug-http")]
+            if let Err(e) = req.save_debug("debug_request.txt") {
+                eprintln!("⚠️  Failed to save debug file: {}", e);
+            } else {
+                println!("📝 Debug saved to: debug_request.txt");
+            }
+
             // TODO Enviar HttpResponse
         }
         Err(e) => {

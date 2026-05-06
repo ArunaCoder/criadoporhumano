@@ -9,6 +9,8 @@ pub struct HttpRequest {
     pub path: String,
     pub headers: std::collections::HashMap<String, String>,
     pub body: String,
+    #[cfg(feature = "debug-http")]
+    pub raw_bytes: Vec<u8>,
 }
 
 impl HttpRequest {
@@ -17,6 +19,9 @@ impl HttpRequest {
         const TYPICAL_LINE_SIZE: usize = 1024; // 1KB covers 99% of real requests
         const MAX_HEADERS: usize = 100;
 
+        #[cfg(feature = "debug-http")]
+        let mut raw_capture = Vec::new();
+
         // Pre-allocate buffer for typical case (optimization vs fragmentation)
         let mut line = String::with_capacity(TYPICAL_LINE_SIZE);
 
@@ -24,6 +29,9 @@ impl HttpRequest {
         limited
             .read_line(&mut line)
             .map_err(|e| format!("Error reading request line: {}", e))?;
+
+        #[cfg(feature = "debug-http")]
+        raw_capture.extend_from_slice(line.as_bytes());
 
         if line.len() >= MAX_LINE_SIZE && !line.ends_with('\n') {
             return Err("414 URI Too Long".to_string());
@@ -88,6 +96,9 @@ impl HttpRequest {
                 .read_line(&mut line)
                 .map_err(|e| e.to_string())?;
 
+            #[cfg(feature = "debug-http")]
+            raw_capture.extend_from_slice(line.as_bytes());
+
             // Protection: header line too large (DoS attempt)
             if bytes_read >= MAX_LINE_SIZE && !line.ends_with('\n') {
                 return Err("431 Request Header Fields Too Large".to_string());
@@ -118,6 +129,52 @@ impl HttpRequest {
             path: path.to_string(),
             headers,
             body: String::new(),
+            #[cfg(feature = "debug-http")]
+            raw_bytes: raw_capture,
         })
+    }
+
+    #[cfg(feature = "debug-http")]
+    pub fn save_debug(&self, path: &str) -> std::io::Result<()> {
+        use std::fs::File;
+        use std::io::Write;
+
+        let mut file = File::create(path)?;
+
+        writeln!(
+            file,
+            "============================================================"
+        )?;
+        writeln!(file, "HTTP REQUEST DEBUG DUMP")?;
+        writeln!(
+            file,
+            "============================================================\n"
+        )?;
+
+        writeln!(file, "--- RAW BYTES (Wire Format) ---")?;
+        file.write_all(&self.raw_bytes)?;
+        if !self.raw_bytes.ends_with(b"\n") {
+            writeln!(file)?;
+        }
+
+        writeln!(file, "\n--- PARSED STRUCT (After Processing) ---")?;
+        writeln!(file, "Method: {}", self.method)?;
+        writeln!(file, "Path: {}", self.path)?;
+        writeln!(file, "Headers (normalized):")?;
+        for (key, value) in &self.headers {
+            writeln!(file, "  {}: {}", key, value)?;
+        }
+        writeln!(file, "Body: {}", self.body)?;
+
+        writeln!(file, "\n--- TRANSFORMATIONS APPLIED ---")?;
+        writeln!(file, "✓ Header keys: lowercased")?;
+        writeln!(file, "✓ Header values: trimmed")?;
+        writeln!(file, "✓ Path: validated (no ../ or //)")?;
+        writeln!(
+            file,
+            "============================================================"
+        )?;
+
+        Ok(())
     }
 }

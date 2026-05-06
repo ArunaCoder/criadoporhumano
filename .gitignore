@@ -48,6 +48,11 @@ test-results/
 *.heapsnapshot
 *.heapprofile
 
+# HTTP debug dumps (Rust feature flag debug-http)
+debug_*.txt
+*.debug.txt
+.debug/
+
 # --- Database (SQLite Soberano) ---
 # Essencial para não subir seus dados reais ou travar o banco no Git
 *.db
