@@ -66,10 +66,11 @@ Este projeto substitui frameworks de alto nível por implementações manuais. O
 
 ## Fluxo de Trabalho
 
-1. **Camada 1:** Implementar servidor HTTP baixo nível
-2. **Camada 2:** Adicionar routing e lógica de validação
-3. **Camada 3:** Criar frontend e embedar no binário
-4. **Camada 4:** Dockerizar e fazer deploy em VPS
+1. **Camada 1:** Implementar servidor HTTP baixo nível (Passos 1-13)
+2. **Camada 2:** Adicionar routing e lógica de validação (Passos 14-19)
+3. **Camada 3:** Criar frontend e embedar no binário (Passos 20-26)
+4. **Camada 4:** Dockerizar e fazer deploy em VPS (Passos 27-35)
+5. **Camada 5 (Opcional):** Otimizações avançadas para produção (thread pool, zero-copy, async)
 
 ## Diferencial
 
@@ -95,4 +96,7 @@ Este projeto implementa **segurança em profundidade**:
 
 ## Status
 
-**Em progresso** - Ver arquivos `01-*.md` a `04-*.md` para checklists detalhados.
+**Em progresso** - Ver arquivos:
+
+- **Fase 1 (Fundamentos):** `01-*.md` a `04-*.md` para checklists detalhados
+- **Fase 2 (Otimizações):** `05-otimizacoes-avancadas.md` para thread pool, zero-copy, e async

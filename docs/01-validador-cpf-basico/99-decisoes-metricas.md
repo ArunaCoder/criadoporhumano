@@ -185,14 +185,15 @@ Implementar buffer manualmente ensinaria principalmente **unsafe code** (ponteir
 
 - ⏱️ Single-threaded: máx ~1-5k req/s (suficiente para MVP)
 - 💾 Sem cache de resultados (CPF sempre é recalculado)
-- 🔄 Sem keep-alive (nova conexão TCP por request - intencional para simplicidade)
-- 🚨 **File descriptor leak potencial:** Sem keep-alive, alta carga pode esgotar FDs disponíveis. Monitorar com `lsof` em produção.
+- ✅ **HTTP keep-alive:** Implementado no Passo 9.3 (reduz latência 10-100x)
+- ✅ **Cache de arquivos estáticos:** Implementado no Passo 13.1 (reduz I/O 1000x)
+- 📊 **Thread pool:** Planejado para Fase 2 (escala multi-core)
 
 ### Compatibilidade HTTP
 
 - ❌ Não suporta: chunked encoding, HTTP/2, HTTP/3, WebSockets
 - ❌ Não suporta: multipart/form-data, cookies, sessions
-- ❌ Não suporta: HTTP keep-alive (Connection: close forçado)
+- ✅ Suporta: HTTP keep-alive (Connection: keep-alive com timeout)
 - ✅ Suporta: GET, POST, HEAD, OPTIONS
 - ✅ Suporta: Headers básicos, JSON, CORS
 - ✅ Suporta: HTTP/1.0 e HTTP/1.1
