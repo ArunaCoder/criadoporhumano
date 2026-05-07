@@ -124,16 +124,28 @@ impl HttpRequest {
 
     #[cfg(feature = "debug-http")]
     pub fn save_debug(&self, path: &str) -> std::io::Result<()> {
-        use std::fs::File;
+        use std::fs::OpenOptions;
         use std::io::Write;
+        use std::time::{SystemTime, UNIX_EPOCH};
 
-        let mut file = File::create(path)?;
+        // Append mode: adiciona ao final sem sobrescrever
+        let mut file = OpenOptions::new()
+            .create(true) // Cria se não existir
+            .append(true) // Adiciona ao final (preserva requests anteriores)
+            .open(path)?;
 
+        // Timestamp para diferenciar requests no mesmo arquivo
+        let timestamp = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap()
+            .as_millis();
+
+        writeln!(file, "\n")?;
         writeln!(
             file,
             "============================================================"
         )?;
-        writeln!(file, "HTTP REQUEST DEBUG DUMP")?;
+        writeln!(file, "HTTP REQUEST DEBUG DUMP - {}", timestamp)?;
         writeln!(
             file,
             "============================================================\n"
