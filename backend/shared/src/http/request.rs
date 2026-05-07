@@ -1,8 +1,9 @@
-use ::std::path::PathBuf;
 use std::collections::HashMap;
-use std::env;
 use std::io::{BufRead, BufReader, Read};
 use std::net::TcpStream;
+use std::path::PathBuf;
+
+use crate::ServerConfig;
 
 pub struct HttpRequest {
     pub method: String,
@@ -14,7 +15,10 @@ pub struct HttpRequest {
 }
 
 impl HttpRequest {
-    pub fn parse(reader: &mut BufReader<&mut TcpStream>) -> Result<Self, String> {
+    pub fn parse(
+        reader: &mut BufReader<&mut TcpStream>,
+        config: &ServerConfig,
+    ) -> Result<Self, String> {
         const MAX_LINE_SIZE: usize = 8192;
         const TYPICAL_LINE_SIZE: usize = 1024; // 1KB covers 99% of real requests
         const MAX_HEADERS: usize = 100;
@@ -101,28 +105,12 @@ impl HttpRequest {
                 );
             }
         }
-
-        let base_dir = env::var("PUBLIC_DIR").unwrap_or_else(|_| "public".to_string());
-
-        let base = PathBuf::from(base_dir);
-
-        let requested = base.join(path.trim_start_matches('/'));
-
-        let canonical = requested
-            .canonicalize()
-            .map_err(|_| "invalid path or file not found".to_string())?;
-
-        let base_canonical = base
-            .canonicalize()
-            .map_err(|_| "Failed to resolve base directory".to_string())?;
-
-        if !canonical.starts_with(&base_canonical) {
-            return Err("Path traversal detected".to_string());
-        }
-
+        // 1. Reject suspicious syntax (cheap, fast)
         if path.contains("..") || path.contains("//") {
-            return Err("Invalid path".to_string());
+            return Err("Suspicious path syntax".to_string());
         }
+
+        validate_path_traversal(&path, &config.base_canonical)?;
 
         Ok(HttpRequest {
             method: method.to_string(),
@@ -177,4 +165,18 @@ impl HttpRequest {
 
         Ok(())
     }
+}
+
+fn validate_path_traversal(path: &str, base_canonical: &PathBuf) -> Result<(), String> {
+    let requested = base_canonical.join(path.trim_start_matches('/'));
+
+    let canonical = requested
+        .canonicalize()
+        .map_err(|_| "Invalid path or file not found".to_string())?;
+
+    if !canonical.starts_with(&base_canonical) {
+        return Err("Path traversal detected".to_string());
+    }
+
+    Ok(())
 }
