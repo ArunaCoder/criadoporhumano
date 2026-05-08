@@ -63,6 +63,7 @@ Este projeto substitui frameworks de alto nível por implementações manuais. O
 - **Docker:** Multi-stage build + `FROM scratch`
 - **Infra:** VPS (512MB RAM suficiente)
 - **HTTPS (opcional):** Caddy (auto-SSL)
+- **Observabilidade:** Logs estruturados (JSON), métricas Prometheus, health checks
 
 ## Fluxo de Trabalho
 
@@ -83,6 +84,7 @@ Ao final deste projeto, você terá:
 - ✅ Sistema deployável em qualquer Linux
 - ✅ Zero dependências de runtime
 - ✅ Implementação production-ready com validações de segurança
+- ✅ **Observabilidade completa** (logs estruturados, métricas, health checks) para ambientes sem shell
 
 ## Princípios de Segurança
 
@@ -93,10 +95,3 @@ Este projeto implementa **segurança em profundidade**:
 3. **Resource management:** Timeouts (read/write), Connection: close forçado, file descriptor monitoring
 4. **Princípio do menor privilégio:** Container rodando como usuário não-root
 5. **Defense in depth:** Múltiplas camadas de validação (cliente + servidor)
-
-## Status
-
-**Em progresso** - Ver arquivos:
-
-- **Fase 1 (Fundamentos):** `01-*.md` a `04-*.md` para checklists detalhados
-- **Fase 2 (Otimizações):** `05-otimizacoes-avancadas.md` para thread pool, zero-copy, e async

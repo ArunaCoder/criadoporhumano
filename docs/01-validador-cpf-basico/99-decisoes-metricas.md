@@ -166,6 +166,143 @@ Implementar buffer manualmente ensinaria principalmente **unsafe code** (ponteir
 
 ---
 
+### 6. Normalização de Headers: to_lowercase() vs Alternativas
+
+**Decisão:** Normalizar headers com `to_lowercase()` apesar do custo de alocação.
+
+#### 🔬 Análise do Problema
+
+**Estado atual:**
+
+```rust
+headers.insert(
+    key.trim().to_lowercase(), // ← Aloca String nova (heap allocation)
+    value.trim().to_string()
+);
+```
+
+**O que acontece em baixo nível:**
+
+Para cada header recebido (média de 15 por request):
+
+1. `to_lowercase()` cria uma **nova String** no heap (~24 bytes de metadata + tamanho da chave)
+2. Copia caracteres convertendo para minúsculas
+3. HashMap toma ownership dessa String
+
+**Custo agregado:**
+
+- 15 headers × 24 bytes de overhead = **360 bytes de alocação por request**
+- Em 10k req/s = **3.6 MB/s de alocações no heap**
+- Em 100k req/s = **36 MB/s** (começa a ser relevante)
+
+#### 🎯 Por que isso acontece?
+
+HTTP headers são **case-insensitive** por especificação (RFC 7230):
+
+```
+Content-Type: application/json  ← Válido
+content-type: application/json  ← Também válido
+CONTENT-TYPE: application/json  ← Também válido
+```
+
+Para garantir lookup consistente, normalizamos tudo para lowercase. Alternativas existem, mas cada uma tem trade-offs.
+
+#### 🛠️ Alternativas Avaliadas
+
+##### Opção A: Comparação Case-Insensitive no Lookup
+
+```rust
+// Guardar original (sem normalização)
+headers.insert(key.trim().to_string(), value.trim().to_string());
+
+// Buscar com iteração
+let content_type = headers.iter()
+    .find(|(k, _)| k.eq_ignore_ascii_case("content-type"))
+    .map(|(_, v)| v);
+```
+
+**Trade-offs:**
+
+- ✅ **Economia:** Zero alocações extras
+- ❌ **Performance:** Lookup de **O(1) → O(n)** (desastre!)
+- ❌ **Complexidade:** Código verboso em todo lugar que busca header
+
+**Veredito:** Perder O(1) lookup é inaceitável. Headers são consultados centenas de vezes por request.
+
+##### Opção B: Índice Duplo (Preservar Original)
+
+```rust
+struct Headers {
+    lookup: HashMap<String, String>,    // Lowercase para busca
+    original: HashMap<String, String>,  // Case original para debug
+}
+```
+
+**Trade-offs:**
+
+- ✅ **Performance:** Mantém O(1) lookup
+- ✅ **Debug:** Preserva case original
+- ❌ **Memória:** Dobra uso de RAM (2× HashMaps)
+- ❌ **Complexidade:** API mais complexa
+
+**Veredito:** Dobrar memória para preservar case que só importa em debug não compensa.
+
+##### Opção C: String Interning (Avançado)
+
+```rust
+// Usar crate 'string-cache' ou pool de strings
+// Pre-aloca strings comuns: "content-type", "host", "user-agent"
+lazy_static! {
+    static ref COMMON_HEADERS: HashMap<&'static str, &'static str> = {
+        hashmap!{
+            "content-type" => "content-type",
+            "host" => "host",
+            // ...
+        }
+    };
+}
+```
+
+**Trade-offs:**
+
+- ✅ **Performance:** Zero alocações para headers comuns (~80% dos casos)
+- ❌ **Complexidade:** Gerenciamento de pool, crate externo
+- ❌ **Overhead:** Lookup extra no pool antes de alocar
+
+**Veredito:** Engenharia avançada que só vale em escala massiva (1M+ req/s).
+
+#### 📊 Decisão: **NÃO IMPLEMENTAR**
+
+**Justificativa:**
+
+1. **Custo vs Benefício Negativo:**
+   - Economia: 360 bytes/req = **0.0003% de memória** em servidor moderno
+   - Rust allocator (jemalloc) é extremamente eficiente para pequenas alocações
+   - Perder O(1) lookup ou dobrar memória é muito pior que 360 bytes
+
+2. **Prioridades de Otimização:**
+
+   ```
+   Alto impacto (1000x+):  Syscalls, I/O de disco, network latency
+   Médio impacto (10-100x): Algoritmos O(n²), locks desnecessários
+   Baixo impacto (1-5x):    Alocações pequenas (este caso)
+   ```
+
+3. **Quando Revisitar:**
+   - ✓ Após profiling mostrar que alocações de headers são gargalo (improvável)
+   - ✓ Servidor processando 100k+ req/s (escala gigante)
+   - ✓ Todas otimizações de alto impacto já implementadas
+
+4. **Otimizações de ALTO IMPACTO ainda não feitas:**
+   - HTTP keep-alive (reduz overhead de TCP handshake — **implementado no Passo 9.3**)
+   - Cache de arquivos em memória (elimina I/O de disco — **implementado no Passo 13.1**)
+   - Thread pool (paraleliza requests em multi-core — **Fase 2: produção, ver 05-otimizacoes-avancadas.md**)
+   - Zero-copy file serving via sendfile() (elimina cópia memória — **Fase 2: produção, requer crate, ver 05-otimizacoes-avancadas.md**)
+
+**Veredito Final:** Economia marginal (~1-2% de performance em melhor caso, **perda** no pior caso). **Não priorizar** — focar em otimizações que dão 10x-1000x de ganho primeiro.
+
+---
+
 ## Limitações Conhecidas
 
 ### Segurança

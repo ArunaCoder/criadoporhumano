@@ -26,7 +26,14 @@
 **Trade-off:** Debugabilidade vs segurança (escolhemos segurança)
 
 - **Custo:** Sem shell para debug (`docker exec` não funciona)
-- **Mitigação:** Logs via stdout, debug local antes de containerizar
+- **Mitigação obrigatória:**
+  - ✅ **Logs estruturados em JSON** para stdout (ver [05-otimizacoes-avancadas.md](05-otimizacoes-avancadas.md#55-observabilidade-para-produção))
+  - ✅ **Endpoint `/health`** com informações do sistema
+  - ✅ **Endpoint `/metrics`** para monitoramento externo (Prometheus)
+  - ✅ **Debug local completo** antes de containerizar
+  - 📖 **Leitura recomendada:** [`../security/observabilidade-producao.md`](../security/observabilidade-producao.md) — Guia completo de observabilidade em containers minimalistas
+
+> **IMPORTANTE:** `FROM scratch` sem observabilidade é profissional. `FROM scratch` *com* observabilidade impecável é **engenharia de elite**.
 
 ### Kubernetes vs Docker Simples em VPS
 
