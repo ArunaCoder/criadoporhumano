@@ -28,7 +28,7 @@ O sistema de ownership, borrowing, lifetimes, stack vs heap, smart pointers.
 
 Tipos fundamentais do Rust para lidar com valores opcionais e erros. Métodos úteis e patterns.
 
-- **Recursos:** The Rust Book (Capítulo 6), Rust by Example
+- **Recursos:** The Rust Book (Capítulo 6), Rust by Example, <https://doc.rust-lang.org/std/option/enum.Option.html>
 
 ### 5. Sistemas Operacionais (Básico)
 
@@ -130,12 +130,18 @@ Threads, Mutex, Arc, Atomics, async/await, tokio, futures.
 4. ✅ **Hardware pode ser intercalado** (Nand2Tetris não bloqueia o resto)
 5. ✅ **Documentação é viva** (marque progresso, adicione insights)
 
-**Exemplo de semana paralela:**
+**Semana paralela de 09/05/2026 a 08/05/2027:**
 
-- Segunda/Quarta: The Rust Book (2 capítulos)
-- Terça: Comprehensive Rust (1 módulo)
-- Quinta: Projeto Validador CPF (implementar parser HTTP)
-- Sexta: Docker e Deploy (criar Dockerfile, testar build)
-- Sábado: Nand2Tetris (1 projeto de hardware)
+- Segunda: The Rust Book + Projeto Validador CPF
+- Terça: Comprehensive Rust + Projeto Validador CPF
+- Quarta: Projeto Validador CPF + The Rust Book
+- Quinta: Projeto Validador CPF + OSTEP
+- Sexta: Docker e Deploy + Comprehensive Rust
+- Sábado: Nand2Tetris + Projeto Validador CPF
+
+**Depois:**
+
+- Avaliar incluir observabilidade e Rust avançado
+- Outras matérias
 
 **Lembre-se:** Familiaridade se ganha com repetição distribuída, não com maestria sequencial.
