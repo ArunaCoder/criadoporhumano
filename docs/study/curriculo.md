@@ -118,6 +118,12 @@ Threads, Mutex, Arc, Atomics, async/await, tokio, futures.
 
 - **Recursos:** "Rust Atomics and Locks" (Mara Bos), Jon Gjengset videos
 
+### 17. Ecossistema Rust - Bibliotecas Fundamentais
+
+Estudar **internamente** como funcionam serde, tokio, hyper, sqlx, tracing. Ler código-fonte para entender design patterns e não ficar refém de abstrações.
+
+- **Recursos:** Código-fonte no GitHub, "Crust of Rust" (Jon Gjengset), docs.rs
+
 ---
 
 ## 📋 Notas de Uso
@@ -137,7 +143,7 @@ Threads, Mutex, Arc, Atomics, async/await, tokio, futures.
 - Quarta: Projeto Validador CPF + The Rust Book
 - Quinta: Projeto Validador CPF + OSTEP
 - Sexta: Docker e Deploy + Comprehensive Rust
-- Sábado: Nand2Tetris + Projeto Validador CPF
+- Sábado: Nand2Tetris + Comprehensive Rust
 
 **Depois:**
 

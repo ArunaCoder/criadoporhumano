@@ -19,7 +19,7 @@ impl HttpRequest {
         reader: &mut BufReader<&mut TcpStream>,
         config: &ServerConfig,
     ) -> Result<Self, String> {
-        const MAX_LINE_SIZE: usize = 8192;
+        const MAX_LINE_SIZE: usize = 2048;
         const TYPICAL_LINE_SIZE: usize = 1024; // 1KB covers 99% of real requests
         const MAX_HEADERS: usize = 100;
 

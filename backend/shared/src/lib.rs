@@ -27,7 +27,7 @@ Aqui está o monólogo técnico de como esse código foi concebido:
 1. A Estrutura de Dados (O Esqueleto)
 "Preciso de uma struct": Porque quero agrupar o estado da configuração em um único objeto coerente. Não quero variáveis soltas pelo sistema; quero uma fonte da verdade única para o servidor.
 
-"O campo base_canonical deve ser pub": Porque outros módulos (como o seu roteador ou o motor de busca de arquivos) precisarão ler esse caminho para saber onde buscar o HTML/JS. Ele é público para leitura, mas imutável após a criação.
+"O campo base_canonical deve ser pub": Porque outros módulos (como o meu roteador ou o motor de busca de arquivos) precisarão ler esse caminho para saber onde buscar o HTML/JS. Ele é público para leitura, mas imutável após a criação.
 
 "O tipo deve ser PathBuf": Jamais usaria uma String aqui. Uma String é apenas uma sequência de bytes UTF-8. Um PathBuf é uma estrutura que entende as regras do Sistema Operacional (separadores / vs \, limites de caracteres). É o tipo correto para manipulação de arquivos no disco.
 
