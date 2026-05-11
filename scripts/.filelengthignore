@@ -22,4 +22,5 @@ scripts/check-cycles.mjs
 
 # muito documentados. **corrigir o script para não considerar comentários**
 
-backend/shared/src/http/server.r
+backend/shared/src/http/server.rs
+backend/shared/src/http/request.rs

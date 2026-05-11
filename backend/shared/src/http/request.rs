@@ -19,8 +19,13 @@ impl HttpRequest {
         reader: &mut BufReader<&mut TcpStream>,
         config: &ServerConfig,
     ) -> Result<Self, String> {
+        // descartado o uso, para  o MVP de &'static str como retorno do erro
+
+        // O limite de 2KB equilibra segurança e compatibilidade. Padrões da indústria
+        // (Nginx: 8KB) aceitam headers maiores, mas 2KB cobrem casos típicos enquanto mitigam ataques de DoS e injeção.
+        // Aumente para 4KB se tokens JWT ou acúmulo de cookies se tornarem um problema.
         const MAX_LINE_SIZE: usize = 2048;
-        const TYPICAL_LINE_SIZE: usize = 1024; // 1KB covers 99% of real requests
+        const TYPICAL_LINE_SIZE: usize = 1024; // 1KB cobre  99% de requests legítimas
         const MAX_HEADERS: usize = 100;
 
         #[cfg(feature = "debug-http")]
@@ -38,14 +43,14 @@ impl HttpRequest {
         raw_capture.extend_from_slice(line.as_bytes());
 
         if line.len() >= MAX_LINE_SIZE && !line.ends_with('\n') {
-            return Err("414 URI Too Long".to_string());
+            return Err("414 URI Too Long".to_string()); //embora a conversão explícita seja desnecessária, fica claro aqui o custo de alocação. Não será usado .into() justamente para a conversão ficar explícita.
         }
 
         // Parsear linha de request
         let (method, path, version) = {
             let parts: Vec<&str> = line.split_whitespace().collect();
             if parts.len() != 3 {
-                return Err("Invalid request line: expected METHOD PATH VERSION".into());
+                return Err("Invalid request line: expected METHOD PATH VERSION".to_string());
             }
 
             // Extraímos os três como Strings independentes
@@ -66,11 +71,11 @@ impl HttpRequest {
             return Err("HTTP version not supported".to_string());
         }
 
-        // Parse HTTP headers with protection against HashDoS
+        // Parsear headers HTTP com proteção contra HashDoS
         let mut headers: HashMap<String, String> = HashMap::with_capacity(15);
 
         loop {
-            line.clear(); // Reuse buffer - maintains capacity, zero heap allocation cost
+            line.clear(); // Reusar buffer - mantém capacidade com zero custo de alocação no heap
 
             let bytes_read = reader
                 .by_ref()
@@ -81,42 +86,64 @@ impl HttpRequest {
             #[cfg(feature = "debug-http")]
             raw_capture.extend_from_slice(line.as_bytes());
 
-            // Protection: header line too large (DoS attempt)
+            // Proteção: linha do header muito grande (DoS attempt)
             if bytes_read >= MAX_LINE_SIZE && !line.ends_with('\n') {
                 return Err("431 Request Header Fields Too Large".to_string());
             }
 
-            // End of headers (empty line in HTTP protocol)
+            // Fim dos headers (linha vazia no protocolo HTTP)
             let trimmed = line.trim();
             if trimmed.is_empty() {
                 break;
             }
 
-            // Protection: too many headers (HashDoS attack)
+            // Proteção: muitos headers (HashDoS attack)
             if headers.len() >= MAX_HEADERS {
                 return Err("Too many headers".to_string());
             }
 
-            // Parse header without extra allocations
+            // Parsear header sem alocações extras
             if let Some((key, value)) = trimmed.split_once(':') {
                 headers.insert(
-                    key.trim().to_lowercase(), // Normalize for case-insensitive lookup
+                    key.trim().to_lowercase(), // Normalizar para case-insensitive lookup
                     value.trim().to_string(),
                 );
             }
         }
-        // 1. Reject suspicious syntax (cheap, fast)
+        // Rejeitar sintaxe suspeita (cheap, fast)
         if path.contains("..") || path.contains("//") {
             return Err("Suspicious path syntax".to_string());
         }
 
         validate_path_traversal(&path, &config.base_canonical)?;
 
+        let mut body = String::new();
+
+        if let Some(content_length_str) = headers.get("content-length") {
+            let content_length: usize = content_length_str
+                .parse()
+                .map_err(|_| "400 Bad Request: Invalid Content-Length".to_string())?;
+
+            const MAX_BODY_SIZE: usize = 8192;
+
+            if content_length > MAX_BODY_SIZE {
+                return Err("413 Payload Too Large".to_string());
+            };
+
+            let mut body_bytes = vec![0u8; content_length];
+            reader
+                .read_exact(&mut body_bytes)
+                .map_err(|_| "IO Error: Failed to read body")?;
+
+            body = String::from_utf8(body_bytes)
+                .map_err(|_| "Invalid UTF8 body request".to_string())?;
+        }
+
         Ok(HttpRequest {
             method: method.to_string(),
             path: path.to_string(),
             headers,
-            body: String::new(),
+            body,
             #[cfg(feature = "debug-http")]
             raw_bytes: raw_capture,
         })
