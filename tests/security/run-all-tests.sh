@@ -41,6 +41,10 @@ bash "$SCRIPT_DIR/test-methods.sh"
 echo ""
 echo ""
 
+bash "$SCRIPT_DIR/test-body-parsing.sh"
+echo ""
+echo ""
+
 echo "╔══════════════════════════════════════════════╗"
 echo "║   All Security Tests Completed               ║"
 echo "╚══════════════════════════════════════════════╝"

@@ -117,6 +117,8 @@ impl HttpRequest {
 
         validate_path_traversal(&path, &config.base_canonical)?;
 
+        // Validação do body
+
         let mut body = String::new();
 
         if let Some(content_length_str) = headers.get("content-length") {
