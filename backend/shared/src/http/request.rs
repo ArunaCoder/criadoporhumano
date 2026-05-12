@@ -1,9 +1,9 @@
+use crate::ServerConfig;
+use crate::http::limits::*;
 use std::collections::HashMap;
 use std::io::{BufRead, BufReader, Read};
 use std::net::TcpStream;
 use std::path::PathBuf;
-
-use crate::ServerConfig;
 
 pub struct HttpRequest {
     pub method: String,
@@ -24,9 +24,7 @@ impl HttpRequest {
         // O limite de 2KB equilibra segurança e compatibilidade. Padrões da indústria
         // (Nginx: 8KB) aceitam headers maiores, mas 2KB cobrem casos típicos enquanto mitigam ataques de DoS e injeção.
         // Aumente para 4KB se tokens JWT ou acúmulo de cookies se tornarem um problema.
-        const MAX_LINE_SIZE: usize = 2048;
         const TYPICAL_LINE_SIZE: usize = 1024; // 1KB cobre  99% de requests legítimas
-        const MAX_HEADERS: usize = 100;
 
         #[cfg(feature = "debug-http")]
         let mut raw_capture = Vec::new();
@@ -62,7 +60,7 @@ impl HttpRequest {
         };
 
         // Validar HTTP
-        const ALLOWED_METHODS: &[&str] = &["GET", "POST", "HEAD", "OPTIONS"];
+
         if !ALLOWED_METHODS.contains(&method.as_str()) {
             return Err(format!("Method not allowed: {}", method));
         }
@@ -125,8 +123,6 @@ impl HttpRequest {
             let content_length: usize = content_length_str
                 .parse()
                 .map_err(|_| "400 Bad Request: Invalid Content-Length".to_string())?;
-
-            const MAX_BODY_SIZE: usize = 8192;
 
             if content_length > MAX_BODY_SIZE {
                 return Err("413 Payload Too Large".to_string());
