@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 
-import fs from "fs";
-import path from "path";
-import { fileURLToPath } from "url";
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -56,7 +56,7 @@ class Logger {
   }
 
   writeToFile() {
-    const content = this.logs.join("\n") + "\n\n" + this.getStatsReport();
+    const content = `${this.logs.join("\n")}\n\n${this.getStatsReport()}`;
     fs.writeFileSync(this.logFile, content, "utf-8");
   }
 
@@ -103,7 +103,7 @@ function getAllFiles(dir, files = []) {
 function extractImports(filePath) {
   const content = fs.readFileSync(filePath, "utf-8");
   const imports = new Set();
-  const lines = content.split("\n");
+  const _lines = content.split("\n");
 
   // Padrões de import ES6
   const importPatterns = [
@@ -118,20 +118,22 @@ function extractImports(filePath) {
   ];
 
   for (const pattern of importPatterns) {
-    let match;
-    while ((match = pattern.exec(content)) !== null) {
+    let match = pattern.exec(content);
+    while (match !== null) {
       const importPath = match[1];
 
       // Ignora imports de node_modules ou externos
       if (!importPath.startsWith(".") && !importPath.startsWith("@/")) {
         logger.log(`  [SKIP] ${importPath} (externo)`);
         logger.stats.importsSkipped++;
+        match = pattern.exec(content);
         continue;
       }
 
       imports.add(importPath);
       logger.log(`  [IMPORT] ${importPath}`);
       logger.stats.importsFound++;
+      match = pattern.exec(content);
     }
   }
 
@@ -143,7 +145,7 @@ function extractImports(filePath) {
  */
 function resolveImportPath(fromFile, importPath) {
   const fromDir = path.dirname(fromFile);
-  const originalImport = importPath;
+  const _originalImport = importPath;
   const projectRoot = path.resolve(__dirname, "..");
 
   logger.log(`  [RESOLVE] ${importPath}`);
@@ -152,7 +154,7 @@ function resolveImportPath(fromFile, importPath) {
 
   // Trata alias @/ como src/ relativo ao workspace
   if (importPath.startsWith("@/")) {
-    logger.log(`    [ALIAS] Convertendo @/ para src/ do workspace`);
+    logger.log("    [ALIAS] Convertendo @/ para src/ do workspace");
     importPath = importPath.replace("@/", "");
 
     // Encontra o workspace do arquivo atual
@@ -184,7 +186,7 @@ function resolveImportPath(fromFile, importPath) {
         const indexPath = path.join(resolved, `index${ext}`);
         logger.log(`    [TRY] ${path.relative(projectRoot, indexPath)}`);
         if (fs.existsSync(indexPath)) {
-          logger.log(`    [SUCCESS] Index encontrado`);
+          logger.log("    [SUCCESS] Index encontrado");
           logger.stats.importsResolved++;
           return indexPath;
         }
@@ -203,7 +205,7 @@ function resolveImportPath(fromFile, importPath) {
     }
   }
 
-  logger.log(`    [NOT FOUND] Arquivo não existe no projeto`);
+  logger.log("    [NOT FOUND] Arquivo não existe no projeto");
   logger.stats.importsSkipped++;
   return resolved;
 }
@@ -337,12 +339,14 @@ function main() {
 
   logger.section("INICIALIZAÇÃO");
   logger.log(`Workspaces: ${SRC_DIRS.length}`);
-  SRC_DIRS.forEach((dir) => logger.log(`  - ${dir}`));
+  for (const dir of SRC_DIRS) {
+    logger.log(`  - ${dir}`);
+  }
   logger.log(`Arquivo de log: ${LOG_FILE}`);
   logger.log(`Extensões suportadas: ${EXTENSIONS.join(", ")}`);
 
   if (SRC_DIRS.length === 0) {
-    const error = `Nenhum diretório src/ encontrado nos workspaces`;
+    const error = "Nenhum diretório src/ encontrado nos workspaces";
     logger.log(`[ERROR] ${error}`);
     logger.writeToFile();
     console.error(`❌ ${error}`);
