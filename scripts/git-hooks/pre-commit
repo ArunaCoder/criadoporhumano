@@ -1,0 +1,48 @@
+#!/bin/bash
+set -e
+
+echo "🔍 Verificando secrets nos arquivos staged..."
+
+# Executa o Gitleaks para escanear apenas arquivos staged
+if ! gitleaks protect --staged --verbose --redact; then
+  echo ""
+  echo "🛑 COMMIT BLOQUEADO!"
+  echo "❌ Gitleaks detectou possíveis secrets nos arquivos staged."
+  echo ""
+  echo "Ações recomendadas:"
+  echo "  1. Remova o secret do código"
+  echo "  2. Use variáveis de ambiente (.env) - não versionadas"
+  echo "  3. Se for falso positivo, adicione à allowlist em .gitleaks.toml"
+  echo ""
+  exit 1
+fi
+
+echo "✅ Nenhum secret detectado."
+echo ""
+
+echo "🔄 Verificando dependências circulares..."
+if ! node scripts/check-cycles.mjs; then
+  echo ""
+  echo "🛑 COMMIT BLOQUEADO!"
+  echo "❌ Dependências circulares detectadas."
+  echo "Use: npm run check-cycles:verbose para detalhes"
+  echo ""
+  exit 1
+fi
+
+echo "✅ Sem dependências circulares."
+echo ""
+
+echo "📏 Verificando tamanho de arquivos..."
+if ! bash scripts/file-length.sh; then
+  echo ""
+  echo "🛑 COMMIT BLOQUEADO!"
+  echo "❌ Arquivos muito longos detectados."
+  echo "Refatore arquivos grandes em módulos menores."
+  echo ""
+  exit 1
+fi
+
+echo "✅ Tamanho de arquivos OK."
+echo ""
+echo "✅ Pre-commit concluído com sucesso!"

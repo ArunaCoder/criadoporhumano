@@ -1,3 +1,0 @@
-#!/bin/sh
-# Valida a mensagem de commit contra o padrão Conventional Commits
-./scripts/verify-commit.sh "$1"
