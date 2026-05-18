@@ -54,4 +54,12 @@ Com duas variáveis, já temos 16 funções possíveis:
 
 > A arte do design lógico pode ser descrita da seguinte forma: Dada uma especificação de porta (interface), encontre uma maneira eficiente de implementá-la usando outras portas que já foram implementadas.
 
-continuar em 1.1.3 Actual Hardware Construction
+**17/05/2026**
+
+Seria impossível escalar a produção de portas sem o uso de `HDL - Hardware Description Language`, em que se pode criar, otimizar e testar a arquitetura de chips. O HDL usado no projeto está descrito no Apêndice A, aqui <https://drive.google.com/file/d/1E2ujh66aCx62raYMuJ4dTWdQh7TAH9N_/view>.
+
+# Part I2: Especificação
+
+O capítulo especifica as portas que serão construídas com a linguagem do apêndice A, usando um built-in Nand.
+
+próximo passo: construir as portas com o HDL, no <https://nand2tetris.github.io/web-ide/chip>.
