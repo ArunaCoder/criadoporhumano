@@ -115,6 +115,11 @@ impl HttpRequest {
 
         validate_path_traversal(&path, &config.base_canonical)?;
 
+        // Retorna erro se POST não tem body
+        if method == "POST" && !headers.contains_key("content-length") {
+            return Err("411 Length Required".to_string());
+        }
+
         // Validação do body
 
         let mut body = String::new();
