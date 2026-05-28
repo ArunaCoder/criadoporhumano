@@ -5,6 +5,7 @@
 - Monorepo Híbrido: Backend em Rust (`services/*`) e Frontend em Vanilla TypeScript (`apps/*`).
 - Bibliotecas compartilhadas em `libs/*`.
 - Foco: Performance, segurança (Rust) e controle total (Vanilla TS, sem frameworks pesados).
+- Estamos usando Rust edition 2024. Leia [The_Rust_Edition_Guide_Rust_2024](The_Rust_Edition_Guide_Rust_2024.md) para verificar se o código sugerido ou gerado está atualizado.
 
 ---
 
